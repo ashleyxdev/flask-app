@@ -4,13 +4,14 @@ pipeline {
     stages {
         stage('Clone') {
             steps {
-                echo 'Code is already checked out'
+                git branch: 'main',
+                    url: 'https://github.com/ashleyxdev/flask-app.git'
             }
         }
 
         stage('Build') {
             steps {
-                sh 'docker build -t flask-app .'
+                sh 'docker build -t flask-app:dev .'
             }
         }
 
@@ -23,18 +24,18 @@ pipeline {
 
         stage('Health Check') {
             steps {
-                sleep(time: 5, unit: 'SECONDS')
-                sh 'curl -f http://localhost:5000/health'
+                sleep(time: 8, unit: 'SECONDS')
+                sh 'docker exec test-app curl -f http://localhost:5000/health'
             }
         }
     }
 
     post {
         success {
-            echo 'Pipeline succeeded! App is running.'
+            echo '✅ Pipeline succeeded! Blog app is live on port 5000.'
         }
         failure {
-            echo 'Pipeline failed! Check the logs.'
+            echo '❌ Pipeline failed! Check the logs above.'
         }
     }
 }
